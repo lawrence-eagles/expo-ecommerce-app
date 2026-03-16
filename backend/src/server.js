@@ -1,7 +1,22 @@
 import express from "express";
+import path from "path";
+import { ENV } from "./config/env";
 
 const app = express();
 
-app.get("/", (req, res) => res.status(200).json({ message: "Success" }));
+const __dirname = path.resolve();
 
-app.listen(5000, () => console.log("Server is up and running"));
+app.get("/api/home", (req, res) =>
+  res.status(200).json({ message: "Success" }),
+);
+
+// make app ready for deployment
+if (ENV.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../admin/dist")));
+
+  app.get("/{*any}", (req, res) => {
+    res.sendFile(path.join(__dirname, "../admin", "dist", "index.html"));
+  });
+}
+
+app.listen(ENV.PORT, () => console.log("Server is up and running"));
