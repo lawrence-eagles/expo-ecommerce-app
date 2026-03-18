@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import { clerkMiddleware } from "@clerk/express";
+import cors from "cors";
 import { ENV } from "./config/env.js";
 import { connectDB } from "./config/db.js";
 import { serve } from "inngest/express";
@@ -8,6 +9,8 @@ import { serve } from "inngest/express";
 import { functions, inngest } from "./config/inngest.js";
 
 const app = express();
+// Adds headers: Access-Control-Allow-Origin: *
+app.use(cors());
 
 const __dirname = path.resolve();
 
@@ -22,13 +25,13 @@ app.get("/api/home", (req, res) =>
 );
 
 // make app ready for deployment
-if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../admin/dist")));
+// if (ENV.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "../admin/dist")));
 
-  app.get("/{*any}", (req, res) => {
-    res.sendFile(path.join(__dirname, "../admin", "dist", "index.html"));
-  });
-}
+//   app.get("/{*any}", (req, res) => {
+//     res.sendFile(path.join(__dirname, "../admin", "dist", "index.html"));
+//   });
+// }
 
 const startServer = async () => {
   await connectDB();
