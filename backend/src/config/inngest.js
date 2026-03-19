@@ -10,10 +10,18 @@ const syncUser = inngest.createFunction(
   { id: "sync-user", triggers: [{ event: "clerk/user.created" }] },
   async ({ event }) => {
     await connectDB();
-    const { id, email_addresses, first_name, last_name, image_url } =
-      event.data;
 
-    console.log("created user event", event);
+    const { user } = event.data;
+    const { id, first_name, last_name, image_url } = user;
+
+    const email = user.email_addresses.find(
+      (e) => e.id === user.primary_email_address_id,
+    ).email;
+
+    // const { id, email_addresses, first_name, last_name, image_url } =
+    // event.data;
+
+    // console.log("created user event", event);
 
     const newUser = {
       clerkId: id,
@@ -34,8 +42,10 @@ const deleteUserFromDB = inngest.createFunction(
   { id: "delete-user-from-db", triggers: [{ event: "clerk/user.deleted" }] },
   async ({ event }) => {
     await connectDB();
-    console.log("delete user event", event);
-    const { id } = event.data;
+
+    // const { id } = event.data;
+    const { user } = event.data;
+    const { id } = user;
     await User.deleteOne({ clerkId: id });
   },
 );
