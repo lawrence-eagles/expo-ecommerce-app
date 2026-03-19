@@ -11,21 +11,19 @@ const syncUser = inngest.createFunction(
   async ({ event }) => {
     await connectDB();
 
-    const { user } = event.data;
-    const { id, first_name, last_name, image_url } = user;
+    // const { user } = event.data;
+    // const { id, first_name, last_name, image_url } = user;
 
-    const email = user.email_addresses.find(
-      (e) => e.id === user.primary_email_address_id,
-    ).email;
+    // const email = user.email_addresses.find(
+    //   (e) => e.id === user.primary_email_address_id,
+    // ).email;
 
-    // const { id, email_addresses, first_name, last_name, image_url } =
-    // event.data;
-
-    // console.log("created user event", event);
+    const { id, email_addresses, first_name, last_name, image_url } =
+      event.data;
 
     const newUser = {
       clerkId: id,
-      email,
+      email: email_addresses[0].email_address,
       name: `${first_name || ""} ${last_name || ""}` || "User",
       imageUrl: image_url,
       addresses: [],
@@ -43,10 +41,12 @@ const deleteUserFromDB = inngest.createFunction(
   async ({ event }) => {
     await connectDB();
 
-    // const { id } = event.data;
-    const { user } = event.data;
-    const { id } = user;
-    await User.deleteOne({ clerkId: id });
+    const { id } = event.data;
+    // const { user } = event.data;
+    // const { id } = user;
+    if (id) {
+      await User.deleteOne({ clerkId: id });
+    }
   },
 );
 
