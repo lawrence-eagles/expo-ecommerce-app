@@ -2,6 +2,7 @@ import cloudinary from "../config/cloudinary.js";
 import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
 import { User } from "../models/user.model.js";
+import mongoose from "mongoose";
 
 export async function createProduct(req, res) {
   try {
@@ -64,7 +65,13 @@ export async function updateProduct(req, res) {
     const { id } = req.params;
     const { name, description, price, stock, category } = req.body;
 
+    // Added this chec to validate ids based on code rabbit suggestion
+    if (!mongoose.isObjectIdOrHexString(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
     const product = await Product.findById(id);
+
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
