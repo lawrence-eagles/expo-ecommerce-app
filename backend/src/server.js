@@ -22,7 +22,7 @@ app.use(clerkMiddleware()); // add auth object under the request so we can say r
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
-app.use("api/admin", adminRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => res.status(200).json({ message: "Success" }));
 
