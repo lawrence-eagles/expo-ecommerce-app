@@ -23,7 +23,6 @@ export async function createProduct(req, res) {
     }
 
     const uploadPromises = req.files.map((file) => {
-      console.log("files", file);
       return cloudinary.uploader.upload(file.path, {
         folder: "products",
       });
@@ -65,7 +64,7 @@ export async function updateProduct(req, res) {
     const { id } = req.params;
     const { name, description, price, stock, category } = req.body;
 
-    // Added this chec to validate ids based on code rabbit suggestion
+    // Added this check to validate ids based on code rabbit suggestion
     // 1. Validate ObjectId before query
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid product ID format" });
@@ -196,7 +195,7 @@ export async function getDashboardStats(_, res) {
       totalProducts,
     });
   } catch (error) {
-    console.error("Error getting dashborad stats:", error);
+    console.error("Error getting dashboard stats:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
