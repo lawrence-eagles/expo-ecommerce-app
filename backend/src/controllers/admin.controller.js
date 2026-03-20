@@ -68,7 +68,7 @@ export async function updateProduct(req, res) {
     // Added this chec to validate ids based on code rabbit suggestion
     // 1. Validate ObjectId before query
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID format" });
+      return res.status(400).json({ message: "Invalid product ID format" });
     }
 
     const product = await Product.findById(id);
@@ -124,6 +124,11 @@ export async function updatedOrderStatus(req, res) {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
+
+    // 1. Validate ObjectId before query
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ error: "Invalid order ID format" });
+    }
 
     if (!["pending", "shipped", "delivered"].includes(status)) {
       return res.status(400).json({ error: "Invalid status" });
