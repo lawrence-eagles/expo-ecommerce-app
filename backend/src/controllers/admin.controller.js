@@ -66,8 +66,9 @@ export async function updateProduct(req, res) {
     const { name, description, price, stock, category } = req.body;
 
     // Added this chec to validate ids based on code rabbit suggestion
-    if (!mongoose.isObjectIdOrHexString(id)) {
-      return res.status(400).json({ message: "Invalid ID" });
+    // 1. Validate ObjectId before query
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
     }
 
     const product = await Product.findById(id);
