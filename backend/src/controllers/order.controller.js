@@ -11,8 +11,27 @@ export async function createOrder(req, res) {
       return res.status(400).json({ message: "No order items" });
     }
 
+    // Suggested method to compute total from the server-side because getting total from the client side via req.body is not recommended since client can manipulate total.
+    // const { orderItems, shippingAddress, paymentResult } = req.body;
+    // let totalPrice = 0;
+    // for (const item of orderItems) {
+    //   const product = await Product.findById(item.product._id).select("price");
+    //   if (!product) {
+    //     return res.status(404).json({ message: `product ${item.name} not found` });
+    //   }
+    //   totalPrice += product.price * item.quantity;
+    // }
+
     // validate products and stock
     for (const item of orderItems) {
+      // suggested method to validate order items shapte before dereferencing nested fields.
+      //   if (
+      //     !item?.product?._id ||
+      //     !Number.isFinite(item.quantity) ||
+      //     item.quantity <= 0
+      //   ) {
+      //     return res.status(400).json({ message: "Invalid order item payload" });
+      //   }
       const product = await Product.findById(item.product._id);
       if (!product) {
         return res
