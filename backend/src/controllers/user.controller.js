@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { User } from "../models/user.model.js";
 
 // address controllers
@@ -142,6 +143,10 @@ export async function addToWishlist(req, res) {
     const { productId } = req.body;
     const user = req.user;
 
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: "Invalid product ID format" });
+    }
+
     // check if product is already in the wishlist
     if (user.wishlist.includes(productId)) {
       return res.status(400).json({ message: "Product already in wishlist" });
@@ -185,7 +190,7 @@ export async function remoteFromWishlist(req, res) {
     });
   } catch (error) {
     console.error("Error removing product from wihslist", error);
-    res.stats(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
