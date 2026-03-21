@@ -8,6 +8,7 @@ import { serve } from "inngest/express";
 
 import adminRoutes from "./routes/admin.route.js";
 import userRoutes from "./routes/user.routes.js";
+import orderRoutes from "./routes/order.routes.js";
 
 import { functions, inngest } from "./config/inngest.js";
 
@@ -25,6 +26,7 @@ app.use("/api/inngest", serve({ client: inngest, functions }));
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.get("/", (req, res) => res.status(200).json({ message: "Success" }));
 
