@@ -46,6 +46,7 @@ export async function addToCart(req, res) {
     let cart = await Cart.findOne({ clerkId: req.user.clerkId });
 
     if (!cart) {
+      const user = req.user;
       cart = await Cart.create({
         user: user._id,
         clerkId: user.clerkId,
@@ -88,8 +89,19 @@ export async function updateCartItem(req, res) {
       return res.status(400).json({ message: "Invalid product ID format" });
     }
 
-    if (quantity < 1) {
-      return res.status(400).json({ message: "Quantity must be at least 1" });
+    // if (quantity < 1) {
+    //   return res.status(400).json({ message: "Quantity must be at least 1" });
+    // }
+
+    // code rabbit input
+    if (
+      typeof quantity !== "number" ||
+      !Number.isInteger(quantity) ||
+      quantity < 1
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Quantity must be an integer of at least 1" });
     }
 
     const cart = await Cart.findOne({ clerkId: req.user.clerkId });
@@ -145,7 +157,7 @@ export async function removeFromCart(req, res) {
 
     res.status(200).json({ message: "Item removed from cart", cart });
   } catch (error) {
-    console.error("Error removing product from cart", cart);
+    console.error("Error removing product from cart", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
