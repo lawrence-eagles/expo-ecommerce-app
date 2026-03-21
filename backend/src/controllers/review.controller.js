@@ -27,7 +27,7 @@ export async function createReview(req, res) {
     // This is becuase you can only add review if order is delivered.
     const order = await Order.findById(orderId);
     if (!order) {
-      return res.status(404).findById({ message: "Order not found" });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     // check if user made the order
@@ -73,13 +73,21 @@ export async function createReview(req, res) {
     });
 
     // update the product rating
-    const product = await Product.findById(productId);
     const reviews = await Review.find({ productId });
     const totalRating = reviews.reduce((sum, rev) => sum + rev.rating, 0);
-    product.avaerageRating = totalRating / reviews.length;
-    product.totalReviews = reviews.length;
+    const updateProduct = await Product.findByIdAndUpdate(
+      productId,
+      {
+        averageRating: totalRating / reviews.length,
+        totalReviews: reviews.length,
+      },
+      { new: true, runValidators: true },
+    );
 
-    await product.save();
+    if (!updateProduct) {
+      await Review.findByIdAndDelete(review._id);
+      return res.status(404).json({ message: "Product not found" });
+    }
 
     res.status(201).json({ message: "Review submitted successfully", review });
   } catch (error) {
