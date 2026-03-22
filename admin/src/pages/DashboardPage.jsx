@@ -27,7 +27,7 @@ const DashboardPage = () => {
       name: "Total Revenue",
       value: statsLoading
         ? "..."
-        : `$${statsData.totalRevenue.toFixed(2) || 0}`,
+        : `$${statsData?.totalRevenue?.toFixed(2) || 0}`,
       icon: <DollarSignIcon className="size-8" />,
     },
     {
@@ -98,7 +98,7 @@ const DashboardPage = () => {
                       <td>
                         <div>
                           <div className="font-medium">
-                            {order.shppingAddress.fullName}
+                            {order.shippingAddress.fullName}
                           </div>
                           <div className="text-sm opacity-60">
                             {order.orderItems.length} items(s)
