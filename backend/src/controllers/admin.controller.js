@@ -199,3 +199,19 @@ export async function getDashboardStats(_, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid product ID format" });
+    }
+
+    await Product.findByIdAndDelete(id);
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting product", error);
+    res.status(500).json({ message: "Failed to delete product" });
+  }
+};
