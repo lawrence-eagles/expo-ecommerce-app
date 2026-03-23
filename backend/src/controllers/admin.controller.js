@@ -208,6 +208,22 @@ export const deleteProduct = async (req, res) => {
       return res.status(400).json({ error: "Invalid product ID format" });
     }
 
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Delete images from cloudinary
+    if (product.images && product.images.length > 0) {
+      const deletePromises = product.images.map((imageUrl) => {
+        // Extract public_id from URL (assumes format: .../products/publicId.ext)
+        const publicId =
+          "products/" + imageUrl.split("/products/")[1]?.split(",")[0];
+        if (publicId) return cloudinary.uploader.destroy(publicId);
+      });
+      await Promise.all(deletePromises.filter(Boolean));
+    }
+
     await Product.findByIdAndDelete(id);
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {

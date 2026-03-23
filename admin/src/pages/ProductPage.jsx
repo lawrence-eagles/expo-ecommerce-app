@@ -22,6 +22,7 @@ const ProductPage = () => {
   });
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [deletingProductId, setDeletingProductId] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -55,6 +56,10 @@ const ProductPage = () => {
     onSuccess: () => {
       closeModal();
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      setDeletingProductId(null);
+    },
+    onError: () => {
+      setDeletingProductId(null);
     },
   });
 
@@ -93,6 +98,12 @@ const ProductPage = () => {
     // or, if the object is not iterable, array-like objects (objects with a length property and indexed elements)
     const files = Array.from(e.target.files);
     if (files.length > 3) return alert("Maximum 3 images allowed");
+
+    // handle memory leak problem
+    // revoke previous blob URLs to free memory
+    imagePreviews.forEach((url) => {
+      if (url.startsWith("blob")) URL.revokeObjectURL(url);
+    });
 
     setImages(files);
 
@@ -189,7 +200,9 @@ const ProductPage = () => {
 
                       <div>
                         <p className="text-xs text-base-content/70">Stock</p>
-                        <p className="font-bold text-lg">units</p>
+                        <p className="font-bold text-lg">
+                          {product.stock} units
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -203,9 +216,13 @@ const ProductPage = () => {
                     </button>
                     <button
                       className="btn btn-square btn-ghost text-error"
-                      onClick={() => deleteProductMutation.mutate(product._id)}
+                      onClick={() => {
+                        setDeletingProductId(product._id);
+                        deleteProductMutation.mutate(product._id);
+                      }}
+                      disabled={deletingProductId === product._id}
                     >
-                      {deleteProductMutation.isPending ? (
+                      {deletingProductId === product._id ? (
                         <span className="loading loading-spinner"></span>
                       ) : (
                         <Trash2Icon className="w-5 h-5" />
@@ -220,7 +237,12 @@ const ProductPage = () => {
       </div>
 
       {/* ADD/EDIT PRODUCT MODAL */}
-      <input type="checkbox" className="modal-toggle" checked={showModal} />
+      <input
+        type="checkbox"
+        className="modal-toggle"
+        checked={showModal}
+        onChange={() => console.log("good")}
+      />
       <div className="modal">
         <div className="modal-box max-w-2xl">
           <div className="flex items-center justify-between mb-4">
