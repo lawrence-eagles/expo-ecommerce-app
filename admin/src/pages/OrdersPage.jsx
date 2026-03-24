@@ -116,7 +116,7 @@ const OrdersPage = () => {
 
                         <td>
                           <span className="text-sm opacity-60">
-                            {formatDate(order.createAt)}
+                            {formatDate(order.createdAt)}
                           </span>
                         </td>
                       </tr>
