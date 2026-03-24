@@ -23,7 +23,7 @@ export const getStockStatusBadge = (stock) => {
 };
 
 export const formatDate = (dateString) => {
-  if (!dataString) return "";
+  if (!dateString) return "";
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return "";
   return new Date(dateString).toLocaleDateString("en-us", {
