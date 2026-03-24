@@ -18,7 +18,7 @@ import { functions, inngest } from "./config/inngest.js";
 const app = express();
 // credentials: true allows the browser to send the cookies to the server with the request
 // app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
-app.use(cors({ credentials: true }));
+app.use(cors({ origin: "*", credentials: true }));
 
 // const __dirname = path.resolve();
 
