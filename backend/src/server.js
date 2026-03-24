@@ -25,6 +25,10 @@ app.use(express.json());
 
 app.use(clerkMiddleware()); // add auth object under the request so we can say req.auth
 
+app.get("/", (_, res) =>
+  res.status(200).json({ message: "Welcome to expo-ecommerce app" }),
+);
+
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
 app.use("/api/admin", adminRoutes);
@@ -33,8 +37,6 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
-
-app.get("/", (req, res) => res.status(200).json({ message: "Success" }));
 
 // make app ready for deployment
 // if (ENV.NODE_ENV === "production") {
