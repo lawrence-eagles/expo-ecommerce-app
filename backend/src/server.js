@@ -19,8 +19,6 @@ const app = express();
 // credentials: true allows the browser to send the cookies to the server with the request
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true })); // correct cors implementation
 
-// const __dirname = path.resolve();
-
 app.use(express.json());
 
 app.use(clerkMiddleware()); // add auth object under the request so we can say req.auth
@@ -34,16 +32,9 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 
-app.get("/", (req, res) => res.status(200).json({ message: "Success" }));
-
-// make app ready for deployment
-// if (ENV.NODE_ENV === "production") {
-//   app.use(express.static(path.join(__dirname, "../admin/dist")));
-
-//   app.get("/{*any}", (req, res) => {
-//     res.sendFile(path.join(__dirname, "../admin", "dist", "index.html"));
-//   });
-// }
+app.get("/", (_, res) =>
+  res.status(200).json({ message: "Welcome to expo-ecommerce app" }),
+);
 
 const startServer = async () => {
   await connectDB();
