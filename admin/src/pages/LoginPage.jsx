@@ -2,7 +2,7 @@ import { Show, UserButton, SignInButton } from "@clerk/react";
 
 const LoginPage = () => {
   return (
-    <header>
+    <header className="h-screen flex justify-center items-center">
       <Show when="signed-in">
         <UserButton />
       </Show>
