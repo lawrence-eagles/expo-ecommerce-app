@@ -1,13 +1,10 @@
-import { requireAuth, getAuth } from "@clerk/express";
+import { getAuth } from "@clerk/express";
 import { User } from "../models/user.model.js";
 import { ENV } from "../config/env.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
     const { userId: clerkId, isAuthenticated } = getAuth(req);
-    // const clerkId = req.auth().userId;
-
-    console.log("clerkId", clerkId, "isAuthenticated", isAuthenticated);
 
     if (!clerkId || !isAuthenticated)
       return res.status(401).json({ message: "Unauthorized - invalid token" });
