@@ -1,4 +1,4 @@
-import { Show, UserButton, SignInButton } from "@clerk/react";
+import { Show, UserButton, SignIn } from "@clerk/react";
 
 const LoginPage = () => {
   return (
@@ -7,7 +7,7 @@ const LoginPage = () => {
         <UserButton />
       </Show>
       <Show when="signed-out">
-        <SignInButton />
+        <SignIn />
       </Show>
     </header>
   );

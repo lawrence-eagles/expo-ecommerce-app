@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/react";
-import { ShoppingBagIcon, ShoppingCartIcon } from "lucide-react";
+import { ShoppingBagIcon } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { NAVIGATION } from "./Navbar";
 
