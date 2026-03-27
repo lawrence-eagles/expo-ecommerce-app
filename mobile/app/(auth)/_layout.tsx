@@ -7,7 +7,7 @@ export default function AuthRoutesLayout() {
   if (!isLoaded) return null; // for a better ux
 
   if (isSignedIn) {
-    return <Redirect href={"/"} />;
+    return <Redirect href={"/(tabs)"} />;
   }
 
   // console.log("isSignedIn", isSignedIn, "userId", userId);
