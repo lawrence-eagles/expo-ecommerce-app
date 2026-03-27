@@ -7,6 +7,10 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 // but when using expo go and a physical device the production url will work
 // my system ip and expo-cli connection is 192.168.215.68:8081
 
+if (!API_URL) {
+  throw new Error("EXPO_PUBLIC_API_URL is not configured");
+}
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
