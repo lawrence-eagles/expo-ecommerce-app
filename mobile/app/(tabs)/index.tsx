@@ -4,7 +4,6 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Button,
 } from "react-native";
 import React, { useMemo, useState } from "react";
 import SafeScreen from "@/components/SafeScreen";
