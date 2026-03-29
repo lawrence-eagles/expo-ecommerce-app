@@ -283,7 +283,7 @@ const PrivacyAndSecurityScreen = () => {
                 </Text>
               </View>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={"#F4444"} />
+            <Ionicons name="chevron-forward" size={20} color={"#EF4444"} />
           </TouchableOpacity>
         </View>
 
