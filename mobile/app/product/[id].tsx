@@ -173,7 +173,7 @@ const ProductDetailScreen = () => {
           {/* PRICE */}
           <View className="flex-row items-center mb-6">
             <Text className="text-primary text-4xl font-bold">
-              {product.price.toFixed(2)}
+              ${product.price.toFixed(2)}
             </Text>
           </View>
 
