@@ -129,7 +129,7 @@ const AddressFormModal = ({
                   City
                 </Text>
                 <TextInput
-                  className="bg-surface text-text-primary rounded-2xl font-semibold mb-2"
+                  className="bg-surface text-text-primary rounded-2xl px-4 py-4 font-semibold mb-2"
                   placeholder="e.g, New York"
                   placeholderTextColor={"#666666"}
                   value={addressForm.city}
@@ -148,6 +148,7 @@ const AddressFormModal = ({
                   className="bg-surface text-text-primary px-4 py-4 rounded-2xl text-base"
                   placeholder="e.g, NY"
                   placeholderTextColor={"#666666"}
+                  value={addressForm.state}
                   onChangeText={(text) =>
                     onFormChange({ ...addressForm, state: text })
                   }

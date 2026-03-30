@@ -63,7 +63,7 @@ const AddressesScreen = () => {
       label: address.label,
       fullName: address.fullName,
       streetAddress: address.streetAddress,
-      city: address.state,
+      city: address.city,
       state: address.state,
       zipCode: address.zipCode,
       phoneNumber: address.phoneNumber,
@@ -93,6 +93,7 @@ const AddressesScreen = () => {
       !addressForm.phoneNumber
     ) {
       Alert.alert("Error", "Please fill in all fields");
+      return;
     }
 
     if (editingAddressId) {
@@ -106,7 +107,7 @@ const AddressesScreen = () => {
           onSuccess: () => {
             setShowAddressForm(false);
             setEditingAddressId(null);
-            Alert.alert("Success", "Address upated succesfully");
+            Alert.alert("Success", "Address updated succesfully");
           },
           onError: (error: any) => {
             Alert.alert(
