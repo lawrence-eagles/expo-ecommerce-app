@@ -39,6 +39,8 @@ const CartScreen = () => {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [addressModalVisible, setAddressModalVisible] = useState(false);
 
+  console.log("cart", cart);
+
   const cartItems = cart?.items || [];
   const subtotal = cartTotal;
   const shipping = 10.0; // $10 shipping fee
