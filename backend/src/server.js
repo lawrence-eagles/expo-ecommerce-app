@@ -12,6 +12,8 @@ import orderRoutes from "./routes/order.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
+import checkoutRoutes from "./routes/checkout.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
 
 import { functions, inngest } from "./config/inngest.js";
 
@@ -31,6 +33,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/checkout", checkoutRoutes);
+app.use("/api/payment", paymentRoutes);
 
 app.get("/", (_, res) =>
   res.status(200).json({ message: "Welcome to expo-ecommerce app" }),

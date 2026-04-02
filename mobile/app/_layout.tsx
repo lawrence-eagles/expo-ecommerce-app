@@ -9,6 +9,7 @@ import {
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import * as Sentry from "@sentry/react-native";
+import { PaystackProvider } from "react-native-paystack-webview";
 
 Sentry.init({
   dsn: "https://d350577d75d10cdc00645547cb801808@o4511100096872448.ingest.us.sentry.io/4511116940410880",
@@ -61,13 +62,17 @@ const queryClient = new QueryClient({
 
 export default Sentry.wrap(function RootLayout() {
   return (
-    <ClerkProvider
-      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      tokenCache={tokenCache}
+    <PaystackProvider
+      publicKey={process.env.EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY as string}
     >
-      <QueryClientProvider client={queryClient}>
-        <Stack screenOptions={{ headerShown: false }} />
-      </QueryClientProvider>
-    </ClerkProvider>
+      <ClerkProvider
+        publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        tokenCache={tokenCache}
+      >
+        <QueryClientProvider client={queryClient}>
+          <Stack screenOptions={{ headerShown: false }} />
+        </QueryClientProvider>
+      </ClerkProvider>
+    </PaystackProvider>
   );
 });
