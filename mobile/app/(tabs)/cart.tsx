@@ -6,7 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useUser } from "@clerk/clerk-expo";
+import { usePaystack } from "react-native-paystack-webview";
 import SafeScreen from "@/components/SafeScreen";
 import { useApi } from "@/lib/api";
 import useCart from "@/hooks/useCart";
@@ -35,12 +38,17 @@ const CartScreen = () => {
     updateQuantity,
   } = useCart();
   const { addresses } = useAddresses();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const { popup } = usePaystack();
+  const router = useRouter();
 
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paystackPaymentLoading, setPaystackPaymentLoading] = useState(false);
   const [addressModalVisible, setAddressModalVisible] = useState(false);
+  const [checkoutId, setCheckoutId] = useState<string | null>(null);
 
-  console.log("cart", cart);
-
+  // Get the primary email address string
+  const email: string = user?.primaryEmailAddress?.emailAddress || "";
   const cartItems = cart?.items || [];
   const subtotal = cartTotal;
   const shipping = 10.0; // $10 shipping fee
@@ -89,10 +97,78 @@ const CartScreen = () => {
   // call the create checkout method here.
   const handleProceedWithPayment = async (selectedAddress: Address) => {
     setAddressModalVisible(false);
+    try {
+      setPaymentLoading(true);
+      const { data } = await api.post("/checkout", {
+        cartItems,
+        shippingAddress: {
+          fullName: selectedAddress.fullName,
+          streetAddress: selectedAddress.streetAddress,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          zipCode: selectedAddress.zipCode,
+          phoneNumber: selectedAddress.phoneNumber,
+        },
+        paymentMethod: "Paystack",
+      });
+
+      setCheckoutId(data?.newCheckout?._id);
+    } catch (error: any) {
+      console.error("Checkout error:", error.message);
+    }
   };
 
-  if (isLoading) return <LoadingUI />;
-  if (isError) return <ErrorUI />;
+  const handlePaymentSuccess = async (paystackResponse: any) => {
+    try {
+      const { data } = await api.put(`/checkout/${checkoutId}/pay`, {
+        paymentStatus: "paid",
+        paymentDetails: paystackResponse,
+      });
+
+      await handleFinalizeCheckout(checkoutId!);
+    } catch (error: any) {
+      console.error("Payment processing error:", error);
+    }
+  };
+
+  const handleFinalizeCheckout = async (checkoutId: string) => {
+    try {
+      const { data } = await api.post(`/checkout/${checkoutId}/finalize`);
+      clearCart();
+      router.push("/orders");
+    } catch (error: any) {
+      console.error("Finalize checkout error:", error);
+    } finally {
+      setPaymentLoading(false);
+      setPaystackPaymentLoading(false);
+    }
+  };
+
+  // Setup the Paystack payment popup when checkout is available
+  const payNow = () => {
+    setPaystackPaymentLoading(true);
+    popup.checkout({
+      email,
+      amount: total * 1381, // converts the total to dollars
+      onSuccess: (res) => {
+        handlePaymentSuccess(res);
+      },
+      onCancel: () => {
+        setPaymentLoading(false);
+        setPaystackPaymentLoading(false);
+        console.log("User cancelled");
+      },
+      onLoad: (res) => console.log("WebView Loaded:", res),
+      onError: (err) => {
+        setPaymentLoading(false);
+        setPaystackPaymentLoading(false);
+        console.log("WebView Error:", err);
+      },
+    });
+  };
+
+  if (isLoading || !isLoaded) return <LoadingUI />;
+  if (isError || !isSignedIn) return <ErrorUI />;
   if (cartItems.length === 0) return <EmptyUI />;
 
   return (
@@ -232,25 +308,50 @@ const CartScreen = () => {
         </View>
 
         {/* CHECKOUT BOTTON */}
-        <TouchableOpacity
-          className="bg-primary rounded-2xl overflow-hidden"
-          activeOpacity={0.9}
-          onPress={handleCheckout}
-          disabled={paymentLoading} // find and review this variable
-        >
-          <View className="py-5 flex-row items-center justify-center">
-            {paymentLoading ? (
-              <ActivityIndicator size={"small"} color={"#121212"} />
-            ) : (
-              <>
-                <Text className="text-background font-bold text-lg mr-2">
-                  Checkout
-                </Text>
-                <Ionicons name="arrow-forward" size={20} color={"#121212"} />
-              </>
-            )}
-          </View>
-        </TouchableOpacity>
+        {!paymentLoading && (
+          <TouchableOpacity
+            className="bg-primary rounded-2xl overflow-hidden"
+            activeOpacity={0.9}
+            onPress={handleCheckout}
+            disabled={paymentLoading} // find and review this variable
+          >
+            <View className="py-5 flex-row items-center justify-center">
+              {paymentLoading ? (
+                <ActivityIndicator size={"small"} color={"#121212"} />
+              ) : (
+                <>
+                  <Text className="text-background font-bold text-lg mr-2">
+                    Checkout
+                  </Text>
+                  <Ionicons name="arrow-forward" size={20} color={"#121212"} />
+                </>
+              )}
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* PAYSTAC PAYMENT BUTTON */}
+        {paymentLoading && (
+          <TouchableOpacity
+            className="bg-primary rounded-2xl overflow-hidden"
+            activeOpacity={0.9}
+            onPress={payNow}
+            disabled={paystackPaymentLoading} // find and review this variable
+          >
+            <View className="py-5 flex-row items-center justify-center">
+              {paystackPaymentLoading ? (
+                <ActivityIndicator size={"small"} color={"#121212"} />
+              ) : (
+                <>
+                  <Text className="text-background font-bold text-lg mr-2">
+                    Complete Your Payment
+                  </Text>
+                  <Ionicons name="arrow-forward" size={20} color={"#121212"} />
+                </>
+              )}
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
 
       <AddressSelectionModal
