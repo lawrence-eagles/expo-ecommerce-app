@@ -69,10 +69,10 @@ const orderSchema = new mongoose.Schema(
       type: shippingAddressSchema,
       required: true,
     },
-    paymentResult: {
-      id: String,
-      status: String,
-    },
+    // paymentResult: {
+    //   id: String,
+    //   status: String,
+    // },
     totalPrice: {
       type: Number,
       required: true,
