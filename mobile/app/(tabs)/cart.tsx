@@ -98,7 +98,6 @@ const CartScreen = () => {
   const handleProceedWithPayment = async (selectedAddress: Address) => {
     setAddressModalVisible(false);
     try {
-      setPaymentLoading(true);
       const { data } = await api.post("/checkout", {
         cartItems,
         shippingAddress: {
@@ -115,6 +114,8 @@ const CartScreen = () => {
       setCheckoutId(data?.newCheckout?._id);
     } catch (error: any) {
       console.error("Checkout error:", error.message);
+    } finally {
+      setPaymentLoading(true);
     }
   };
 

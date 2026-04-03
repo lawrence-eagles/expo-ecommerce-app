@@ -12,6 +12,13 @@ export async function createCheckout(req, res) {
   }
 
   try {
+    // Validate cart items format and quantity
+    for (const item of cartItems) {
+      if (!Number.isInteger(item.quantity) || item.quantity < 1) {
+        return res.status(400).json({ error: "Invalid item quantity" });
+      }
+    }
+
     // validate products and stock
     for (const item of cartItems) {
       const product = await Product.findById(item.product._id);
@@ -71,7 +78,7 @@ export async function createCheckout(req, res) {
       shippingAddress,
       paymentMethod,
       totalPrice,
-      paymentStatus: "Pending",
+      paymentStatus: "pending",
       isPaid: false,
     });
 
@@ -92,7 +99,8 @@ export async function updateCheckout(req, res) {
       return res.status(400).json({ message: "Invalid checkout ID format" });
     }
 
-    const checkout = await Checkout.findById(id);
+    // const checkout = await Checkout.findById(id);
+    const checkout = await Checkout.findOne({ _id: id, user: req.user._id }); // ensure user can only update their own checkout
 
     if (!checkout) {
       return res.status(404).json({ message: "Checkout not found" });
@@ -133,7 +141,10 @@ export async function finalizeCheckout(req, res) {
         orderItems: checkout.checkoutItems,
         shippingAddress: checkout.shippingAddress,
         totalPrice: checkout.totalPrice,
-        paymentResult: "Successful",
+        // paymentResult: {
+        //   id: checkout.paymentDetails?.reference,
+        //   status: checkout.paymentStatus,
+        // },
       });
       // update product stock
       for (const item of checkout.checkoutItems) {
@@ -144,7 +155,7 @@ export async function finalizeCheckout(req, res) {
       }
       // Mark the checkout as finalized to prevent duplicate orders
       checkout.isFinalized = true;
-      checkout.finalizeAt = Date.now();
+      checkout.finalizedAt = Date.now();
       await checkout.save();
 
       // Delete the cart associated with the user
