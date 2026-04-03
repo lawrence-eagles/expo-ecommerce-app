@@ -46,6 +46,9 @@ const CartScreen = () => {
   const [paystackPaymentLoading, setPaystackPaymentLoading] = useState(false);
   const [addressModalVisible, setAddressModalVisible] = useState(false);
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
+  const [isCheckoutCreatingCheckout, setIsCheckoutCreatingCheckout] =
+    useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   // Get the primary email address string
   const email: string = user?.primaryEmailAddress?.emailAddress || "";
@@ -97,6 +100,7 @@ const CartScreen = () => {
   // call the create checkout method here.
   const handleProceedWithPayment = async (selectedAddress: Address) => {
     setAddressModalVisible(false);
+    setIsCheckoutCreatingCheckout(true);
     try {
       const { data } = await api.post("/checkout", {
         cartItems,
@@ -112,9 +116,11 @@ const CartScreen = () => {
       });
 
       setCheckoutId(data?.newCheckout?._id);
+      setTotalPrice(data?.newCheckout?.totalPrice || total);
     } catch (error: any) {
       console.error("Checkout error:", error.message);
     } finally {
+      setIsCheckoutCreatingCheckout(false);
       setPaymentLoading(true);
     }
   };
@@ -122,7 +128,7 @@ const CartScreen = () => {
   const handlePaymentSuccess = async (paystackResponse: any) => {
     try {
       const { data } = await api.put(`/checkout/${checkoutId}/pay`, {
-        paymentStatus: "paid",
+        // paymentStatus: "paid",
         paymentDetails: paystackResponse,
       });
 
@@ -150,7 +156,7 @@ const CartScreen = () => {
     setPaystackPaymentLoading(true);
     popup.checkout({
       email,
-      amount: total * 1381, // converts the total to dollars
+      amount: totalPrice,
       onSuccess: (res) => {
         handlePaymentSuccess(res);
       },
@@ -317,7 +323,7 @@ const CartScreen = () => {
             disabled={paymentLoading} // find and review this variable
           >
             <View className="py-5 flex-row items-center justify-center">
-              {paymentLoading ? (
+              {paymentLoading || isCheckoutCreatingCheckout ? (
                 <ActivityIndicator size={"small"} color={"#121212"} />
               ) : (
                 <>
@@ -331,7 +337,7 @@ const CartScreen = () => {
           </TouchableOpacity>
         )}
 
-        {/* PAYSTAC PAYMENT BUTTON */}
+        {/* PAYSTACK PAYMENT BUTTON */}
         {paymentLoading && (
           <TouchableOpacity
             className="bg-primary rounded-2xl overflow-hidden"

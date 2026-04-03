@@ -19,6 +19,13 @@ export async function createCheckout(req, res) {
       }
     }
 
+    // calculate subtotal
+    const subTotal =
+      cartItems.reduce(
+        (sum, item) => sum + item.product.price * item.quantity,
+        0,
+      ) ?? 0;
+
     // validate products and stock
     for (const item of cartItems) {
       const product = await Product.findById(item.product._id);
@@ -34,8 +41,6 @@ export async function createCheckout(req, res) {
       }
     }
 
-    // Calculate total from server-side (don't trust client - ever.)
-    let subtotal = 0;
     const checkoutItems = [];
 
     for (const item of cartItems) {
@@ -52,7 +57,6 @@ export async function createCheckout(req, res) {
           .json({ error: `Insufficient stock for ${product.name}` });
       }
 
-      subtotal += product.price * item.quantity;
       checkoutItems.push({
         product: product._id.toString(),
         name: product.name,
@@ -62,9 +66,11 @@ export async function createCheckout(req, res) {
       });
     }
 
+    // Calculate total from server-side (don't trust client - ever.)
     const shipping = 10.0; // $10
-    const tax = subtotal * 0.08; // 8%
-    const totalPrice = (subtotal + shipping + tax) * 1381; // convert to dollars
+    const tax = subTotal * 0.08; // 8%
+    const totalPriceInNaira = (subTotal + shipping + tax) * 1378.13; // convert to NGN using fixed exchange rate.
+    const totalPrice = parseFloat(totalPriceInNaira.toFixed(2)); // round to 2 decimal places
 
     if (totalPrice <= 0) {
       return res.status(400).json({ error: "Invalid order total" });
@@ -90,7 +96,7 @@ export async function createCheckout(req, res) {
 }
 
 export async function updateCheckout(req, res) {
-  const { paymentStatus, paymentDetails } = req.body;
+  const { paymentDetails } = req.body;
 
   try {
     const { id } = req.params;
@@ -106,9 +112,10 @@ export async function updateCheckout(req, res) {
       return res.status(404).json({ message: "Checkout not found" });
     }
 
-    if (paymentStatus === "paid") {
+    if (paymentDetails.status === "success") {
+      // instead of if paymentStatus === "paid", we can just check if paymentDetails is provided and valid, since paymentStatus is redundant if we have paymentDetails
       checkout.isPaid = true;
-      checkout.paymentStatus = paymentStatus;
+      checkout.paymentStatus = paymentDetails.status; // store the actual status from payment gateway (e.g. "success", "failed") instead of just "paid"
       checkout.paymentDetails = paymentDetails;
       checkout.paidAt = Date.now();
       await checkout.save();
