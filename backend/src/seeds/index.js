@@ -113,8 +113,8 @@ const products = [
     stock: 75,
     category: "Sports",
     images: [
-      "https://unsplash.com/photos/silver-and-black-scissors-on-black-surface-dig7MlnG7oM?w=500",
-      "https://unsplash.com/photos/black-camera-lens-on-brown-textile-IxsqrrqrCbA?w=500",
+      "https://images.unsplash.com/photo-1593433409228-4ebcf9e31556?q=80&w=500",
+      "https://images.unsplash.com/photo-1593433408026-2271b1b86cb3?q=80&w=464",
     ],
     averageRating: 4.5,
     totalReviews: 203,
