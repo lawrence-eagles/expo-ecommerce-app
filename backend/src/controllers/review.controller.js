@@ -54,23 +54,12 @@ export async function createReview(req, res) {
         .json({ message: "Product not found in this order" });
     }
 
-    // check if review already exists
-    const existingReview = await Review.findOne({
-      productId,
-      userId: user._id,
-    });
-    if (existingReview) {
-      return res
-        .status(400)
-        .json({ message: "You have already reviewed this product" });
-    }
-
-    const review = await Review.create({
-      productId,
-      userId: user._id,
-      orderId,
-      rating,
-    });
+    // atomice update or create
+    const review = await Review.findOneAndUpdate(
+      { productId, userId: user._id },
+      { rating, orderId, productId, userId: user._id },
+      { new: true, upsert: true, runValidators: true },
+    );
 
     // update the product rating
     const reviews = await Review.find({ productId });
