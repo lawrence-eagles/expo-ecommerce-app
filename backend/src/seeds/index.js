@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { Product } from "../models/product.model.js";
 import { ENV } from "../config/env.js";
+import { Cart } from "../models/cart.model.js";
+import { Checkout } from "../models/checkout.model.js";
+import { Order } from "../models/order.model.js";
+import { Review } from "../models/review.model.js";
 
 const products = [
   {
@@ -102,15 +106,15 @@ const products = [
     totalReviews: 95,
   },
   {
-    name: "Yoga Mat Pro",
+    name: "Ear Pods",
     description:
-      "Extra-thick non-slip yoga mat with carrying strap. Eco-friendly material provides excellent cushioning and grip for all yoga styles.",
+      "Asymmetric plastic design that rests in the ear without silicone tips. ",
     price: 49.99,
     stock: 75,
     category: "Sports",
     images: [
-      "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=500",
-      "https://images.unsplash.com/photo-1592432678016-e910b452f9a2?w=500",
+      "https://unsplash.com/photos/silver-and-black-scissors-on-black-surface-dig7MlnG7oM?w=500",
+      "https://unsplash.com/photos/black-camera-lens-on-brown-textile-IxsqrrqrCbA?w=500",
     ],
     averageRating: 4.5,
     totalReviews: 203,
@@ -150,6 +154,13 @@ const seedDatabase = async () => {
     // Connect to MongoDB
     await mongoose.connect(ENV.DB_URL);
     console.log("✅ Connected to MongoDB");
+
+    // clear existing data
+    await Cart.deleteMany({});
+    await Checkout.deleteMany({});
+    await Order.deleteMany({});
+    await Review.deleteMany({});
+    console.log("🗑️  Cleared existing carts, checkouts, orders, and reviews");
 
     // Clear existing products
     await Product.deleteMany({});
